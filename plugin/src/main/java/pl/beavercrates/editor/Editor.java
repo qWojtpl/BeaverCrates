@@ -2,6 +2,7 @@ package pl.beavercrates.editor;
 
 import de.tr7zw.nbtapi.NBTItem;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -13,6 +14,7 @@ import pl.beavercrates.crates.Crate;
 import pl.beavercrates.crates.CrateItem;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @Getter
@@ -23,7 +25,11 @@ public class Editor {
     private final Inventory inventory;
     private final String crateName;
     private Crate crate;
+    @Setter
     private EditorMode currentMode;
+    @Setter
+    private int editingSlot;
+    private final HashMap<Integer, Float> percentage = new HashMap<>();
 
     public Editor(Player player, String crateName) {
         this.player = player;
@@ -43,7 +49,9 @@ public class Editor {
         }
         int i = 0;
         for(CrateItem ci : crate.getItems()) {
-            inventory.setItem(i++, ci.getItemStack());
+            inventory.setItem(i, ci.getItemStack());
+            percentage.put(i, (float) ci.getNumberMax());
+            i++;
         }
         ItemStack key = crate.getKey();
         if(crate.getKey() == null) {
@@ -78,15 +86,23 @@ public class Editor {
         inventory.setItem(38, key);
         updateSave();
         inventory.setItem(42, crateItem);
+        ItemStack changeModeItem = new ItemStack(Material.BOOKSHELF);
+        ItemMeta im = changeModeItem.getItemMeta();
+        im.setDisplayName("§aChange mode");
+        changeModeItem.setItemMeta(im);
+        inventory.setItem(49, changeModeItem);
         player.openInventory(inventory);
     }
 
     public void save() {
         List<CrateItem> items = new ArrayList<>();
+        int currentNumber = 0;
         for(int i = 0; i < 27; i++) {
             if(inventory.getItem(i) == null) continue;
             if(inventory.getItem(i).getType().equals(Material.AIR)) continue;
-            items.add(new CrateItem(inventory.getItem(i), 0, 0));
+            items.add(new CrateItem(inventory.getItem(i),
+                    currentNumber+1, currentNumber + Math.round(percentage.getOrDefault(i, 1.0F) * 100)));
+            currentNumber = items.get(items.size()-1).getNumberMax();
         }
         ItemStack key = inventory.getItem(38);
         if(key != null) {
@@ -145,6 +161,12 @@ public class Editor {
         im.setLore(lore);
         saveItem.setItemMeta(im);
         inventory.setItem(40, saveItem);
+    }
+
+    public void reOpen() {
+        plugin.getServer().getScheduler().runTask(plugin, () -> {
+            player.openInventory(inventory);
+        });
     }
 
 }
