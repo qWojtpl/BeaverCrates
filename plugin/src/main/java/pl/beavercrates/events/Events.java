@@ -87,7 +87,7 @@ public class Events implements Listener {
                         plugin.getEditorManager().getEditorMap().put((Player) event.getWhoClicked(), e);
                         event.getWhoClicked().closeInventory();
                         e.setEditingSlot(event.getSlot());
-                        event.getWhoClicked().sendMessage("§aType min and max number on chat: <min>/<max>");
+                        event.getWhoClicked().sendMessage("§aPlease type percentage on chat.");
                     }
                 }
                 return;
