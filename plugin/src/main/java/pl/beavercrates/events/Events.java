@@ -61,19 +61,18 @@ public class Events implements Listener {
                 }
             }
             if(event.getClickedInventory().equals(e.getInventory())) {
+                event.setCancelled(true);
                 if(event.getSlot() == 38 || event.getSlot() == 42) {
-                    event.setCancelled(true);
                     if(event.getCursor() == null) return;
                     if(event.getCursor().getType().equals(Material.AIR)) return;
                     e.getInventory().setItem(event.getSlot(), event.getCursor());
                     e.updateSave();
                 } else if(event.getSlot() == 40) {
-                    e.getPlayer().closeInventory();
-                    event.setCancelled(true);
-                } else if(event.getSlot() >= 27 && event.getSlot() <= 53) {
-                    event.setCancelled(true);
+                    e.save();
+                } else if(event.getSlot() < 27) {
+                    event.setCancelled(false);
                 }
-               return;
+                return;
             }
         }
     }

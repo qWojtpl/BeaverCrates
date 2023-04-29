@@ -1,6 +1,7 @@
 package pl.beavercrates.crates;
 
 import lombok.Getter;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 @Getter

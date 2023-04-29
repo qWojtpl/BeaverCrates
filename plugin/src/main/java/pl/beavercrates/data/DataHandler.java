@@ -45,6 +45,7 @@ public class DataHandler {
             if(section1 == null) continue;
             List<CrateItem> items = new ArrayList<>();
             for(String itemID : section1.getKeys(false)) {
+                if(yml.getConfigurationSection("crates." + name + ".items.item.") == null) continue;
                 items.add(new CrateItem(ItemStack.deserialize(yml.getConfigurationSection("crates." + name + ".items.item." + itemID).getValues(true)), 0, 0));
             }
             Crate crate = new Crate(name, items, crateItem, key);

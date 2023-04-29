@@ -8,7 +8,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.checkerframework.checker.units.qual.C;
 import pl.beavercrates.BeaverCrates;
 import pl.beavercrates.crates.Crate;
 import pl.beavercrates.crates.CrateItem;
@@ -24,28 +23,29 @@ public class Editor {
     private final Inventory inventory;
     private final String crateName;
     private Crate crate;
+    private EditorMode currentMode;
 
     public Editor(Player player, String crateName) {
         this.player = player;
         this.inventory = Bukkit.createInventory(player, 54, "BeaverCrates Editor");
         this.crateName = crateName;
         this.crate = plugin.getCrateManager().getCrate(crateName);
-        setupInventory();
+        this.currentMode = EditorMode.CONTENT;
+        loadContentEditor();
     }
 
-    private void setupInventory() {
+    private void loadContentEditor() {
         for(int i = 27; i < 54; i++) {
             inventory.setItem(i, new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
         }
         if(crate == null) {
             crate = new Crate(crateName, new ArrayList<>(), null, null);
         }
-        ItemStack key = crate.getKey();
         int i = 0;
         for(CrateItem ci : crate.getItems()) {
-            inventory.setItem(i, ci.getItemStack());
-            i++;
+            inventory.setItem(i++, ci.getItemStack());
         }
+        ItemStack key = crate.getKey();
         if(crate.getKey() == null) {
             key = new ItemStack(Material.TRIPWIRE_HOOK);
             key.setAmount(1);
@@ -88,7 +88,6 @@ public class Editor {
             if(inventory.getItem(i).getType().equals(Material.AIR)) continue;
             items.add(new CrateItem(inventory.getItem(i), 0, 0));
         }
-        crate.setItems(items);
         ItemStack key = inventory.getItem(38);
         if(key != null) {
             NBTItem keyNBT = new NBTItem(key);
@@ -113,6 +112,7 @@ public class Editor {
         }
         crate.setKey(key);
         crate.setCrate(crateItem);
+        crate.setItems(items);
         plugin.getCrateManager().addCrate(crate);
         plugin.getDataHandler().saveCrate(crate);
         player.sendMessage("§aSaved crate: " + crate.getName());

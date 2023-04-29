@@ -50,7 +50,8 @@ public class CrateOpen {
             player.playSound(player.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1.0F, 1.0F);
             for(int i = 10; i <= 16; i++) {
                 if((i + 1) > 16) {
-                    inventory.setItem(i, getRandomItem());
+                    ItemStack newItem = getRandomItem();
+                    if(newItem != null) inventory.setItem(i, newItem);
                 } else {
                     inventory.setItem(i, inventory.getItem(i + 1));
                 }
@@ -75,6 +76,7 @@ public class CrateOpen {
     }
 
     private void closePlayerInventory() {
+        plugin.getCrateManager().getCrateOpens().remove(this);
         plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
             plugin.getCrateManager().addItem(player, inventory.getItem(13));
             isOpening = false;
@@ -91,7 +93,11 @@ public class CrateOpen {
 
     private ItemStack getRandomItem() {
         List<CrateItem> items = new ArrayList<>(crate.getItems());
-        return items.get(RandomNumber.randomInt(0, items.size() - 1)).getItemStack();
+        int random = RandomNumber.randomInt(0, 10000);
+        for(CrateItem ci : items) {
+            if(random >= ci.getNumberMin() && random <= ci.getNumberMax()) return ci.getItemStack();
+        }
+        return null;
     }
 
 }
