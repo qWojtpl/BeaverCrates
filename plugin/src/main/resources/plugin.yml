@@ -1,0 +1,13 @@
+name: BeaverCrates
+version: '${project.version}'
+main: pl.beavercrates.BeaverCrates
+api-version: 1.19
+depend: [NBTAPI]
+softdepend: [DeluxeCombat]
+authors: [Assasin98980]
+description: Add crates with custom items to your Minecraft server
+commands:
+  beavercrates:
+    description: Manage BeaverCrates
+    aliases:
+      - bcrates
