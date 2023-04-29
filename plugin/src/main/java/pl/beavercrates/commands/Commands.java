@@ -18,20 +18,20 @@ public class Commands implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if(sender instanceof Player) {
-            if(!sender.hasPermission(pm.getPermission("beavercrates.manage"))) {
+            if(!sender.hasPermission(pm.getPermission("bcrates.manage"))) {
                 sender.sendMessage("§cYou don't have permission!");
                 return true;
             }
         }
         if(args.length > 0) {
-            if(args[0].equalsIgnoreCase("give")) {
+            if(args[0].equalsIgnoreCase("get")) {
                 if(args.length > 1) {
                     boolean giveKey = false;
                     if(args[1].equalsIgnoreCase("key")) {
                         giveKey = true;
                     }
                     if(args.length > 2) {
-                        Crate crate = plugin.getCrateManager().getCrate(args[1]);
+                        Crate crate = plugin.getCrateManager().getCrate(args[2]);
                         if(crate == null) {
                             sender.sendMessage("§cCrate not found...");
                             return true;
@@ -47,9 +47,9 @@ public class Commands implements CommandExecutor {
                                 plugin.getCrateManager().giveCrate(crate, (Player) sender);
                             }
                         } else {
-                            Player p = PlayerUtil.getPlayer(args[2]);
+                            Player p = PlayerUtil.getPlayer(args[3]);
                             if(p == null) {
-                                sender.sendMessage("§cCan't found player: " + args[2]);
+                                sender.sendMessage("§cCan't found player: " + args[3]);
                                 return true;
                             }
                             if(giveKey) {
@@ -58,6 +58,8 @@ public class Commands implements CommandExecutor {
                                 plugin.getCrateManager().giveCrate(crate, p);
                             }
                         }
+                    } else {
+                        sender.sendMessage("§cCorrect usage: /bcrates get <key|case> <name> [player]");
                     }
                 } else {
                     sender.sendMessage("§cCorrect usage: /bcrates get <key|case> <name> [player]");

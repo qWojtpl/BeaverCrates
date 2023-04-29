@@ -5,6 +5,7 @@ import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import pl.beavercrates.BeaverCrates;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -14,14 +15,21 @@ import java.util.List;
 @Getter
 public class CrateManager {
 
+    private final BeaverCrates plugin = BeaverCrates.getInstance();
     private final HashMap<String, Crate> crates = new HashMap<>();
     private final List<CrateOpen> crateOpens = new ArrayList<>();
 
     public void addCrate(Crate crate) {
+        if(getCrate(crate.getName()) != null) {
+            plugin.getLogger().severe("Cannot add case " + crate.getName() +
+                    ", because crate with that name already exist!");
+            return;
+        }
         crates.put(crate.getName(), crate);
+        plugin.getLogger().info("Added crate: " + crate.getName());
     }
 
-    public void openCrate(Crate crate, Player player) {
+    public void openCrate(int slot, Crate crate, Player player) {
         ItemStack key = new ItemStack(crate.getKey());
         key.setAmount(1);
         boolean found = false;
@@ -37,12 +45,16 @@ public class CrateManager {
             }
         }
         if(!found) {
-            player.sendMessage("You don't have a key!");
+            player.sendMessage("§cYou don't have a key!");
+            return;
         }
         ItemStack item = new ItemStack(player.getInventory().getItem(keySlot));
         item.setAmount(player.getInventory().getItem(keySlot).getAmount() - 1);
         player.getInventory().setItem(keySlot, item);
-        crateOpens.add(new CrateOpen(player));
+        item = new ItemStack(player.getInventory().getItemInMainHand());
+        item.setAmount(item.getAmount() - 1);
+        player.getInventory().setItem(slot, item);
+        crateOpens.add(new CrateOpen(player, crate));
     }
 
     public void giveCrate(Crate crate, Player player) {
@@ -56,12 +68,8 @@ public class CrateManager {
     }
 
     public void giveKey(Crate crate, Player player) {
-        ItemStack is = new ItemStack(Material.TRIPWIRE_HOOK);
-        NBTItem nbtItem = new NBTItem(is);
+        ItemStack is = new ItemStack(crate.getKey());
         is.setAmount(1);
-        nbtItem.setBoolean("beavervcrates.isKey", true);
-        nbtItem.setString("beavercrates.id", crate.getName());
-        nbtItem.applyNBT(is);
         addItem(player, is);
     }
 

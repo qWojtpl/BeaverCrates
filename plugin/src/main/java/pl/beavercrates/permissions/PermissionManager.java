@@ -10,7 +10,7 @@ public class PermissionManager {
     private final HashMap<String, Permission> permissions = new HashMap<>();
 
     public PermissionManager() {
-
+        registerPermission("bcrates.manage", "Manage BeaverCrates");
     }
 
     public void registerPermission(String permission, String description) {
