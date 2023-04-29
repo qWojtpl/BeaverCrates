@@ -21,22 +21,29 @@ public class CrateManager {
 
     public void addCrate(Crate crate) {
         if(getCrate(crate.getName()) != null) {
-            plugin.getLogger().severe("Cannot add case " + crate.getName() +
-                    ", because crate with that name already exist!");
-            return;
+            crates.remove(getCrate(crate.getName()));
         }
         crates.put(crate.getName(), crate);
         plugin.getLogger().info("Added crate: " + crate.getName());
     }
 
     public void openCrate(int slot, Crate crate, Player player) {
+        ItemStack item = new ItemStack(player.getInventory().getItemInMainHand());
+        ItemStack crateItem = new ItemStack(crate.getCrate());
+        crateItem.setAmount(1);
+        item.setAmount(1);
+        if(!item.equals(crateItem)) return;
+        item = new ItemStack(player.getInventory().getItemInMainHand());
+        item.setAmount(item.getAmount() - 1);
+        player.getInventory().setItem(slot, item);
+        // Find and take key
         ItemStack key = new ItemStack(crate.getKey());
         key.setAmount(1);
         boolean found = false;
         int keySlot = -1;
         for(int i = 0; i < 36; i++) {
             if(player.getInventory().getItem(i) == null) continue;
-            ItemStack item = new ItemStack(player.getInventory().getItem(i));
+            item = new ItemStack(player.getInventory().getItem(i));
             item.setAmount(1);
             if(item.equals(key)) {
                 found = true;
@@ -48,22 +55,16 @@ public class CrateManager {
             player.sendMessage("§cYou don't have a key!");
             return;
         }
-        ItemStack item = new ItemStack(player.getInventory().getItem(keySlot));
+        item = new ItemStack(player.getInventory().getItem(keySlot));
         item.setAmount(player.getInventory().getItem(keySlot).getAmount() - 1);
         player.getInventory().setItem(keySlot, item);
-        item = new ItemStack(player.getInventory().getItemInMainHand());
-        item.setAmount(item.getAmount() - 1);
-        player.getInventory().setItem(slot, item);
+        //
         crateOpens.add(new CrateOpen(player, crate));
     }
 
     public void giveCrate(Crate crate, Player player) {
-        ItemStack is = new ItemStack(Material.CHEST);
-        NBTItem nbtItem = new NBTItem(is);
+        ItemStack is = new ItemStack(crate.getCrate());
         is.setAmount(1);
-        nbtItem.setBoolean("beavercrates.isCrate", true);
-        nbtItem.setString("beavercrates.id", crate.getName());
-        nbtItem.applyNBT(is);
         addItem(player, is);
     }
 

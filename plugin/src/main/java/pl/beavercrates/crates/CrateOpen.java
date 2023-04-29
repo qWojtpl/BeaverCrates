@@ -35,28 +35,24 @@ public class CrateOpen {
     private void setupInventory() {
         isOpening = true;
         for(int i = 0; i < 27; i++) {
-            getInventory().setItem(i, new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
+            inventory.setItem(i, new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
         }
-        getInventory().setItem(4, new ItemStack(Material.HOPPER));
+        inventory.setItem(4, new ItemStack(Material.HOPPER));
         for(int i = 10; i <= 16; i++) {
-            getInventory().setItem(i, getRandomItem());
+            inventory.setItem(i, getRandomItem());
         }
-        player.openInventory(getInventory());
+        player.openInventory(inventory);
         createTask();
     }
 
     private void createTask() {
         openTask = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
-            if(inventory == null) {
-                cancelOpenTask();
-                return;
-            }
             player.playSound(player.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1.0F, 1.0F);
             for(int i = 10; i <= 16; i++) {
                 if((i + 1) > 16) {
-                    getInventory().setItem(i, getRandomItem());
+                    inventory.setItem(i, getRandomItem());
                 } else {
-                    getInventory().setItem(i, getInventory().getItem(i + 1));
+                    inventory.setItem(i, inventory.getItem(i + 1));
                 }
             }
             level++;
@@ -94,8 +90,8 @@ public class CrateOpen {
     }
 
     private ItemStack getRandomItem() {
-        List<ItemStack> items = new ArrayList<>(crate.getItems());
-        return items.get(RandomNumber.randomInt(0, items.size() - 1));
+        List<CrateItem> items = new ArrayList<>(crate.getItems());
+        return items.get(RandomNumber.randomInt(0, items.size() - 1)).getItemStack();
     }
 
 }

@@ -64,6 +64,16 @@ public class Commands implements CommandExecutor {
                 } else {
                     sender.sendMessage("§cCorrect usage: /bcrates get <key|case> <name> [player]");
                 }
+            } else if(args[0].equalsIgnoreCase("editor")) {
+                if(!(sender instanceof Player)) {
+                    sender.sendMessage("§cYou must be a player!");
+                    return true;
+                }
+                if(args.length > 1) {
+                    plugin.getEditorManager().createEditor((Player) sender, args[1]);
+                } else {
+                    sender.sendMessage("§cCorrect usage: /bcrates editor <name>");
+                }
             }
         }
         return true;
